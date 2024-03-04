@@ -1,0 +1,16 @@
+__pycache__
+
+venv
+.vscode/
+.idea
+local_settings.py
+logs
+static
+
+staticfiles
+api/migrations
+.env
+.coverage
+htmlcov/
+
+credentials/*

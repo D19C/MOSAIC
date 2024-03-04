@@ -1,0 +1,62 @@
+.footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 1200px; /* Ajusta según sea necesario */
+    margin: 0 auto; /* Centra el contenido */
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .social-icons ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .social-icons li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+  
+  .social-icons a {
+    display: block;
+    width: 40px; /* Ancho de los iconos */
+    height: 40px; /* Alto de los iconos */
+  }
+  
+  .social-icons img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Ajusta según necesites */
+  }
+  
+  .mosaic-text {
+    margin-top: 20px; /* Ajusta el espaciado superior según sea necesario */
+  }
+  
+  .mosaic-text p {
+    margin: 5px 0;
+  }
+  
+  .mosaic-text a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .mosaic-text a:hover {
+    text-decoration: underline;
+  }
+  
