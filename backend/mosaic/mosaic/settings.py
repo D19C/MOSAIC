@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-8ton&6mz!8=7fvfyegfj!oo_v!@_9@b7(t=x8y36bb)x6f5+97
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
+APPEND_SLASH=False 
 
 # Application definition
 
@@ -37,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'base.apps.BaseConfig',
+    'rest_framework',
+    'corsheaders',
+    'huey.contrib.djhuey'
 ]
 
 MIDDLEWARE = [
@@ -47,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'mosaic.urls'
@@ -75,11 +82,27 @@ WSGI_APPLICATION = 'mosaic.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mosaic',
+        'USER': 'postgres',
+        'PASSWORD': 'tu_nueva_contrase',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
+HUEY = {
+    'huey_class': 'huey.RedisHuey',
+    'name': DATABASES['default']['NAME'],
+    'immediate': False,
+    'consumer': {'workers': 10, 'worker_type': 'thread', 'periodic': True},
+    'connection': {
+        'host': '127.0.0.1',
+        'port': 6379,
+    }
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
