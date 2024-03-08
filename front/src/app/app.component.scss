@@ -1,0 +1,18 @@
+// app.component.scss
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Altura mínima de la ventana visible */
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+  }
+// global-styles.scss
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Incluir padding y border en el ancho y alto */
+  }
+    

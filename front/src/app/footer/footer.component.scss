@@ -1,0 +1,31 @@
+// footer.component.scss
+.footer {
+    position: fixed; /* Fijar el footer */
+    bottom: 0; /* Anclar en la parte inferior */
+    background-color: #000; /* Fondo negro */
+    color: #fff; /* Color blanco para el texto */
+    width: 100%;
+    padding: 20px 0; /* Relleno superior e inferior */
+    display: flex;
+    justify-content: space-between; /* Distribuir elementos a los extremos */
+    align-items: center; /* Centrar verticalmente */
+  }
+  
+  .button-container {
+    margin-left: 20px; /* Espacio entre los botones */
+  }
+  
+  .button {
+    background-color: #555; /* Color de fondo para los botones */
+    color: #fff; /* Color del texto */
+    padding: 8px 16px; /* Relleno interno */
+    border: none; /* Sin borde */
+    border-radius: 20px; /* Bordes redondeados */
+    cursor: pointer; /* Cursor de puntero */
+    transition: background-color 0.3s ease; /* Transición suave */
+  }
+  
+  .button:hover {
+    background-color: #777; /* Cambio de color al pasar el mouse */
+  }
+  

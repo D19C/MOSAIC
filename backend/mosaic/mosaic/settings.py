@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8ton&6mz!8=7fvfyegfj!oo_v!@_9@b7(t=x8y36bb)x6f5+97
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost']
+ALLOWED_HOSTS = ['127.0.0.1','localhost', "localhost:4200", ]
 
 APPEND_SLASH=False 
 
@@ -56,6 +56,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+]
+
 ROOT_URLCONF = 'mosaic.urls'
 
 TEMPLATES = [
@@ -84,8 +88,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'mosaic',
-        'USER': 'postgres',
-        'PASSWORD': 'tu_nueva_contrase',
+        'USER': 'aether',
+        'PASSWORD': 'admin123',
         'HOST': 'localhost',
         'PORT': '5432',
     }

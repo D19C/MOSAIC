@@ -1,0 +1,33 @@
+// navbar.component.scss
+.navbar {
+    background-color: #000; /* Fondo negro */
+    padding: 10px; /* Relleno interno */
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .newspaper-font {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 28px;
+    font-weight: bold; /* Tipo de letra más grueso */
+    color: #fff; /* Color blanco para el texto */
+    margin: 0; /* Eliminar cualquier margen */
+  }
+  
+  .nav-link {
+    color: #fff;
+    border-radius: 20px;
+    padding: 8px 16px;
+    margin-left: 10px;
+  }
+  
+  .nav-link:hover {
+    background-color: #555;
+  }
+  

@@ -2,9 +2,9 @@
     <div class="container">
       <a class="logo" routerLink="/">MOSAIC</a>
       <ul class="nav-links">
-        <li><a routerLink="/signup">Registrarse</a></li>
-        <li><a routerLink="/login">Iniciar sesión</a></li>
+        <li><button (click)="navigateToSignup()">Registrarse</button></li>
+        <li><button (click)="navigateToLogin()">Iniciar sesión</button></li>
       </ul>
     </div>
   </nav>
-  
+<router-outlet></router-outlet>
