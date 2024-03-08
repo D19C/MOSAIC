@@ -10,10 +10,11 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   authenticate(
-    keep_logged_in: boolean = true,
-    type: string,
     user: string,
-    password: string) {
+    password: string,
+    type: string,
+    keep_logged_in: boolean = true,
+    ) {
     const url = 'http://127.0.0.1:8000/base/auth';
     const body = { 
         keep_logged_in: true,
