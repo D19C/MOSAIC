@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 
 from ..helpers.envs import getenv
 
+from ..models.admin import Admin
 from ..models.auth import Auth
 from ..models.constants import ADMIN, USER, CREATOR
 from ..models.creator import Creator
@@ -40,9 +41,9 @@ def _get_user_type(obj):
     if isinstance(obj, Creator):
         return CREATOR
     elif isinstance(obj, User):
-        return ADMIN if obj.rol == ADMIN else USER
-    else:
         return USER
+    elif isinstance(obj, Admin):
+        return ADMIN
 
 
 class AuthApi(APIView):
@@ -81,16 +82,22 @@ class AuthApi(APIView):
                 "data": validator.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        if request.data["type"] in [ADMIN, USER]:
+        if request.data["type"] == USER:
             obj = User.objects.filter(
                 Q(email=request.data["user"]) |
-                Q(document=request.data["user"]),
-                rol=request.data["type"]
+                Q(document=request.data["user"])
+            ).first()
+
+        elif request.data["type"] == ADMIN:
+            obj = Admin.objects.filter(
+                Q(email=request.data["user"]) |
+                Q(document=request.data["user"])
             ).first()
 
         elif request.data["type"] == CREATOR:
             obj = Creator.objects.filter(
-                Q(username=request.data["user"])
+                Q(email=request.data["user"]) |
+                Q(document=request.data["user"])
             ).first()
 
         if not obj:
@@ -114,17 +121,23 @@ class AuthApi(APIView):
                 else timedelta(days=getenv("KEEP_LOGGED_IN_TOKEN_EXP_DAYS"))
             )),
             "email": obj.email if isinstance(obj, User) else None,
-            "username": obj.username if isinstance(obj, Creator) else None,
             "type": _get_user_type(obj),
             "refresh": refresh
         }, settings.SECRET_KEY, algorithm="HS256").decode("utf-8")
 
         Auth.objects.create(token=token)
-
+        
         if isinstance(obj, User):
             User.objects.filter(email=obj.email).update(
                 last_login=timezone.now())
+        elif isinstance(obj, Admin):
+            Admin.objects.filter(email=obj.email).update(
+                last_login=timezone.now())
+        elif isinstance(obj, Creator):
+            Creator.objects.filter(email=obj.email).update(
+                last_login=timezone.now())
 
+        if obj:
             return Response({
                 "id": obj.pk,
                 "token": token,
@@ -134,22 +147,9 @@ class AuthApi(APIView):
                 "first_name": obj.first_name,
                 "last_name": obj.last_name,
                 "gender": obj.gender,
-                "rol": obj.rol,
                 "status": obj.status,
                 "document": obj.document,
                 "document_type": obj.document_type,
-                "type": _get_user_type(obj)
-            }, status=status.HTTP_201_CREATED)
-            
-        if isinstance(obj, Creator):
-            Creator.objects.filter(username=obj.username).update(
-                last_login=timezone.now())
-
-            return Response({
-                "id": obj.pk,
-                "token": token,
-                "refresh": refresh,
-                "username": obj.username,
                 "type": _get_user_type(obj)
             }, status=status.HTTP_201_CREATED)
 
@@ -234,9 +234,16 @@ class RefreshTokenApi(APIView):
             }, status=status.HTTP_403_FORBIDDEN)
 
         type_token = token["type"]
-        if type_token in [USER, ADMIN]:
+        if type_token == USER:
             obj = User.objects.filter(
-                email=token["email"], document=token["document"], rol=type_token).first()
+                email=token["email"],
+                document=token["document"]
+            ).first()
+        elif type_token == ADMIN:
+            obj = Admin.objects.filter(
+                email=token["email"],
+                document=token["document"]
+            ).first()
         elif type_token == CREATOR:
             obj = Creator.objects.filter(
                 username=token["username"]).first()
@@ -264,10 +271,19 @@ class RefreshTokenApi(APIView):
 
         session.update(token=token)
 
-        if type_token in [USER, ADMIN]:
-            User.objects.filter(email=obj.email).update(
-                last_login=timezone.now())
+        if obj:
+            if type_token == USER:
+                User.objects.filter(email=obj.email).update(
+                    last_login=timezone.now())
+            elif type_token == ADMIN:
+                Admin.objects.filter(email=obj.email).update(
+                    last_login=timezone.now())
+            elif type_token == CREATOR:
+                Creator.objects.filter(username=obj.username).update(
+                    last_login=timezone.now())
+
             Auth.objects.create(token=token)
+
             return Response({
                 "id": obj.pk,
                 "token": token,
@@ -277,22 +293,9 @@ class RefreshTokenApi(APIView):
                 "first_name": obj.first_name,
                 "last_name": obj.last_name,
                 "gender": obj.gender,
-                "rol": obj.rol,
                 "status": obj.status,
                 "document": obj.document,
                 "document_type": obj.document_type,
-                "type": _get_user_type(obj)
-            }, status=status.HTTP_201_CREATED)
-
-        if isinstance(obj, Creator):
-            Creator.objects.filter(username=obj.username).update(
-                last_login=timezone.now())
-
-            return Response({
-                "id": obj.pk,
-                "token": token,
-                "refresh": refresh,
-                "username": obj.username,
                 "type": _get_user_type(obj)
             }, status=status.HTTP_201_CREATED)
 
@@ -326,8 +329,18 @@ class NewPasswordApi(APIView):
 
         """
         validator = Validator({
-            "token": {"required": True, "type": "integer", "empty": False},
-            "new_password": {"required": True, "type": "string", "minlength": 8}
+            "token": {
+                "required": True, "type": "integer",
+                "empty": False
+            },
+            "new_password": {
+                "required": True, "type": "string",
+                "minlength": 8
+            },
+            "user_type": {
+                "required": True, "type": "string",
+                "allowed": [USER, ADMIN, CREATOR]
+            }
         })
         if not validator.validate(request.data):
             return Response({
@@ -336,16 +349,26 @@ class NewPasswordApi(APIView):
                 "data": validator.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.filter(
-            pk=user_pk, token=request.data["token"]).first()
+        if request.data["user_type"] == USER:
+            user = User.objects.filter(
+                pk=user_pk, token=request.data["token"]).first()
+        elif request.data["user_type"] == ADMIN:
+            user = Admin.objects.filter(
+                pk=user_pk, token=request.data["token"]).first()
+        elif request.data["user_type"] == CREATOR:
+            user = Creator.objects.filter(
+                pk=user_pk, token=request.data["token"]).first()
 
         if not user:
             return Response({
                 "code": "user_not_found",
-                "detailed": "Usuario no encontrado o datos inválidos"
+                "detailed": f"{_get_user_type(user)} no encontrado o datos inválidos"
             }, status=status.HTTP_404_NOT_FOUND)
 
-        if user.password == request.data["new_password"]:
+        if check_password(
+            request.data["new_password"],
+            user.password
+        ):
             return Response({
                 "code": "password_already_setted",
                 "detailed": "Contraseña ya asignada previamente"
