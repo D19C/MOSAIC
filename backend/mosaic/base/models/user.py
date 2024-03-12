@@ -60,8 +60,8 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return (
-            f"{self.pk}. {self.first_name} {self.last_name}"
-            f" - {self.status} - {self.rol}"
+            f"{self.pk}. {self.get_full_name()}"
+            f" - {self.status}"
         )
 
     def upload_file(self, file_path, file):

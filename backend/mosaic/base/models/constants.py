@@ -1,8 +1,8 @@
 """ Constants definition """
 
-USER = "usuario"
-ADMIN = "administrador"
-CREATOR = "creador"
+USER = "Usuario"
+ADMIN = "Administrador"
+CREATOR = "Creador"
 
 PENDING = "pending"
 APPROVED = "approved"
